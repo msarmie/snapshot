@@ -404,7 +404,7 @@ public class SpaceItemWriterTest extends SnapshotTestBase {
         ContentStream contentStream = new ContentStream(is, map);
         ContentItem item = new ContentItem(spaceId, contentId);
         
-        expect(retrievalSource.getSourceContent(eq(item), isA(RetrievalListener.class))).andReturn(contentStream);
+        expect(retrievalSource.getSourceContent(eq(item), isNull(RetrievalListener.class))).andReturn(contentStream);
 
         items.add(item);
         this.snapshotManager.addContentItem(eq(snapshot),

@@ -122,12 +122,7 @@ public class SpaceItemWriter extends StepExecutionSupport implements ItemWriter<
         RetrievalWorker retrievalWorker =
             new RetrievalWorker(contentItem, retrievalSource, directory,
                                 true, outputWriter, false, true);
-        Map<String,String> props = retrievalWorker.retrieveFile(new RetrievalListener(){ 
-            @Override
-            public void chunkRetrieved(String chunk) {
-                getStepExecution().getExecutionContext().put("last-chunk-retrieved-" + Thread.currentThread().getName(), chunk);
-            }
-        });
+        Map<String,String> props = retrievalWorker.retrieveFile();
         File localFile = retrievalWorker.getLocalFile();
 
         String md5Checksum = null;
