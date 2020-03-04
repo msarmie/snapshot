@@ -50,7 +50,7 @@ public class SnapshotDatabaseConfig {
         dataSource.setDriverClassName("com.mysql.jdbc.Driver");
         dataSource.setUrl(MessageFormat.format("jdbc:mysql://{0}:{1}/{2}" +
                                                "?useLegacyDatetimeCode=false" +
-                                               "&serverTimezone=GMT" +
+                                               "&serverTimezone=EST" +
                                                "&characterEncoding=utf8" +
                                                "&characterSetResults=utf8",
                                                env.getProperty("snapshot.db.host", "localhost"),
