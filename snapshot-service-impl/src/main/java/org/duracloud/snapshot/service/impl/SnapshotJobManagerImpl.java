@@ -328,6 +328,8 @@ public class SnapshotJobManagerImpl implements SnapshotJobManager {
         stop(snapshot);
         String snapshotDir = ContentDirUtils.getDestinationPath(snapshotId, this.config.getContentRootDir());
         deleteDirectory(snapshotDir);
+        String stagingDir = this.config.getStagingDir().getAbsolutePath() + File.separator + snapshotId + ".zip";
+        deleteDirectory(stagingDir);
 
         new Thread(new Runnable() {
             @Override

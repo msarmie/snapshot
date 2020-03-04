@@ -12,6 +12,11 @@ import static org.duracloud.snapshot.common.SnapshotServiceConstants.SNAPSHOT_AC
 import static org.duracloud.snapshot.common.SnapshotServiceConstants.SNAPSHOT_ID_TITLE;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -107,10 +112,10 @@ public class SnapshotJobExecutionListener implements JobExecutionListener {
             ContentDirUtils.getDestinationPath(snapshot.getName(),
                                                config.getContentRoot());
         log.info("Completed snapshot: {} with status: {}", snapshotId, status);
-
         if (BatchStatus.COMPLETED.equals(status)) {
             File snapshotDir = new File(snapshotPath);
             snapshot.setTotalSizeInBytes(FileUtils.sizeOfDirectory(snapshotDir));
+
             // Job success. Email everyone that a snapshot is ready for
             // transfer into preservation storage.
             String subject =
@@ -124,13 +129,25 @@ public class SnapshotJobExecutionListener implements JobExecutionListener {
             sendEmail(subject, message,
                       config.getAllEmailAddresses());
 
-            changeSnapshotStatus(snapshot, SnapshotStatus.REPLICATING_TO_STORAGE, "");
+            try {
+                // Zip snapshot and copy to staging directory
+                File stagingDir = config.getStagingDir();
+                log.info("Zipping snapshot directory...");
+                zipDirectory(stagingDir, snapshotDir);
 
-            // Add history event
-            String history =
-                "[{'" + SNAPSHOT_ACTION_TITLE + "':'" + SNAPSHOT_ACTION_STAGED + "'}," +
-                "{'" + SNAPSHOT_ID_TITLE + "':'" + snapshotId + "'}]";
-            snapshotManager.updateHistory(snapshot, history);
+                changeSnapshotStatus(snapshot, SnapshotStatus.REPLICATING_TO_STORAGE, "");
+
+                // Add history event
+                String history =
+                    "[{'" + SNAPSHOT_ACTION_TITLE + "':'" + SNAPSHOT_ACTION_STAGED + "'}," +
+                    "{'" + SNAPSHOT_ID_TITLE + "':'" + snapshotId + "'}]";
+                snapshotManager.updateHistory(snapshot, history);
+
+            } catch (IOException e) {
+                log.error("failed to create zip file of snapshot");
+                e.printStackTrace();
+            }
+
         } else {
             // Job failed.  Email DuraSpace team about failed snapshot attempt.
             String subject =
@@ -178,8 +195,62 @@ public class SnapshotJobExecutionListener implements JobExecutionListener {
         } catch (Exception ex) {
             log.error("failed sent email with subject=\""
                       + subject + "\"  and body=\"" + msg + "\"to " + StringUtils.join(destinations, ","));
+            ex.printStackTrace();
 
         }
 
+    }
+
+    /**
+     * Zip snapshot directory to staging directory.
+     * @param stagingDir destination path
+     * @param snapshotDir source path
+     * @throws IOException
+     */
+    private void zipDirectory(File stagingDir, File snapshotDir) throws IOException {
+        File zipFile = new File(stagingDir, snapshotDir.getName() + ".zip");
+        FileOutputStream fileOutputStream = new FileOutputStream(zipFile);
+        ZipOutputStream zipOs = new ZipOutputStream(fileOutputStream);
+
+        zipDirectoryRec(snapshotDir, zipOs, null);
+        zipOs.close();
+        zipOs.flush();
+        fileOutputStream.close();
+        fileOutputStream.flush();
+    }
+
+    /**
+     * Recursively zip directory and contents.
+     * @param file directory/object to zip
+     * @param zipOs ZipOutputStream
+     * @param parentDirName
+     * @throws IOException
+     */
+    private void zipDirectoryRec(File file, ZipOutputStream zipOs, String parentDirName) throws IOException {
+        String zipEntryName = file.getName();
+        if (parentDirName != null && !parentDirName.isEmpty()) {
+            zipEntryName = parentDirName + "/" + file.getName();
+        }
+        if (file.isDirectory()) {
+            for (File content : file.listFiles()) {
+                zipDirectoryRec(content, zipOs, zipEntryName);
+            }
+        } else {
+            try (FileInputStream fos = new FileInputStream(file)) {
+                ZipEntry zipEntry = new ZipEntry(zipEntryName);
+                zipEntry.setSize(file.length());
+                zipEntry.setTime(System.currentTimeMillis());
+                zipOs.putNextEntry(zipEntry);
+                byte[] buf = new byte[1024];
+                int bytesRead;
+
+                while ((bytesRead = fos.read(buf)) > 0) {
+                    zipOs.write(buf, 0, bytesRead);
+                }
+
+                zipOs.closeEntry();
+                fos.close();
+            }
+        }
     }
 }

@@ -77,6 +77,7 @@ public class SnapshotJobExecutionListenerTest extends SnapshotTestBase {
 
     private String snapshotId = "snapshot-id";
     private String contentDir = "content-dir";
+    private String stagingDir = "staging-dir";
     private JobParameters jobParams;
 
     @Before
@@ -136,6 +137,9 @@ public class SnapshotJobExecutionListenerTest extends SnapshotTestBase {
         expect(executionConfig.getAllEmailAddresses())
             .andReturn(new String[] {targetStoreEmail, duracloudEmail});
 
+        expect(executionConfig.getStagingDir())
+            .andReturn(new File(stagingDir));
+
         snapshot.setStatus(SnapshotStatus.REPLICATING_TO_STORAGE);
         snapshot.setTotalSizeInBytes(0l);
         expectLastCall();
@@ -148,9 +152,12 @@ public class SnapshotJobExecutionListenerTest extends SnapshotTestBase {
         replayAll();
 
         File contentDirFile = new File(contentDir);
+        File stagingDirFile = new File(stagingDir);
 
         new File(ContentDirUtils.getDestinationPath(snapshotId,
                                                     contentDirFile)).mkdirs();
+        new File(stagingDirFile.getAbsolutePath()).mkdirs();
+
         executionListener.afterJob(jobExecution);
         String message = messageCapture.getValue();
         assertTrue(message.contains(snapshotId));
@@ -165,6 +172,7 @@ public class SnapshotJobExecutionListenerTest extends SnapshotTestBase {
 
         try {
             FileUtils.deleteDirectory(contentDirFile);
+            FileUtils.deleteDirectory(stagingDirFile);
         } catch (IOException e) {
             e.printStackTrace();
         }

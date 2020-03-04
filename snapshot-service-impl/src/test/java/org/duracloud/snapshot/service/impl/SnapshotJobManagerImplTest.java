@@ -241,6 +241,11 @@ public class SnapshotJobManagerImplTest extends SnapshotTestBase {
         expect(this.snapshotRepo.findByName(isA(String.class))).andReturn(snapshot).atLeastOnce();
         setupStop();
 
+        String stagingDirPath = getTempDir() + File.separator + "staging-dir";
+        File stagingDir = new File(stagingDirPath);
+        FileUtils.forceDeleteOnExit(stagingDir);
+        expect(config.getStagingDir()).andReturn(stagingDir);
+
         String spaceId = "space-id";
         ContentStore contentStore = createMock(ContentStore.class);
         DuracloudEndPointConfig source = createMock(DuracloudEndPointConfig.class);

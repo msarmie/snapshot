@@ -7,6 +7,11 @@
  */
 package org.duracloud.snapshot.service.impl;
 
+import static org.duracloud.snapshot.common.SnapshotServiceConstants.SNAPSHOT_ACTION_COMPLETED;
+import static org.duracloud.snapshot.common.SnapshotServiceConstants.SNAPSHOT_ACTION_TITLE;
+import static org.duracloud.snapshot.common.SnapshotServiceConstants.SNAPSHOT_ALT_IDS_TITLE;
+import static org.duracloud.snapshot.common.SnapshotServiceConstants.SNAPSHOT_ID_TITLE;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -457,6 +462,7 @@ public class SnapshotManagerImpl implements SnapshotManager {
                 }
             } catch (Exception e) {
                 log.error("failed to cleanup " + source);
+                e.printStackTrace();
             }
         }
     }
@@ -510,6 +516,43 @@ public class SnapshotManagerImpl implements SnapshotManager {
         eventLog.logSnapshotUpdate(savedSnapshot);
         log.info("Updated status of " + snapshot + " to " + status);
         return savedSnapshot;
+    }
+
+    @Transactional
+    public void finalizeIngest() {
+        log.debug("Finalize ingest...");
+        List<Snapshot> snapshotsLockss =
+             this.snapshotRepo.findByStatusOrderBySnapshotDateAsc(SnapshotStatus.REPLICATING_TO_STORAGE);
+        for (Snapshot snapshotLockss : snapshotsLockss) {
+            File snapshotZip =  new File(BridgeConfiguration.getBridgeStagingDir(), snapshotLockss.getName() + ".zip");
+            try {
+                if (!snapshotZip.exists()) {
+                    log.debug("Zip directory is gone.");
+                    String altIds = "[]";
+                    String history =
+                            "[{'" + SNAPSHOT_ACTION_TITLE + "':'" + SNAPSHOT_ACTION_COMPLETED + "'}," +
+                            "{'" + SNAPSHOT_ID_TITLE + "':'" + snapshotLockss.getName() + "'}," +
+                            "{'" + SNAPSHOT_ALT_IDS_TITLE + "':" + altIds + "}]";
+                    updateHistory(snapshotLockss, history);
+                    transferToStorageComplete(snapshotLockss.getName());
+                    String subject = MessageFormat.format(
+                            "Snapshot {0} complete.",
+                            snapshotLockss.getName());
+
+                    String body = subject + "\n\nSnapshot object=>" + snapshotLockss.getName();
+
+                    String[] recipients = this.bridgeConfig.getDuracloudEmailAddresses();
+                    log.info(body + "  Sending notification to duracloud admins: {} ", recipients);
+                    this.notificationManager.sendNotification(NotificationType.EMAIL,
+                            subject,
+                            body,
+                            recipients);
+                }
+            } catch (Exception e) {
+                log.error("Failed to commit to LOCKSS.");
+                e.printStackTrace();
+            }
+        }
     }
 
 }
