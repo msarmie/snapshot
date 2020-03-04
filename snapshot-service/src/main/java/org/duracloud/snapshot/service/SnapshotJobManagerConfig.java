@@ -18,6 +18,7 @@ public class SnapshotJobManagerConfig {
     private String duracloudPassword;
     private File contentRootDir;
     private File workDir;
+    private File stagingDir;
 
     /**
      * @return the contentRootDir
@@ -74,4 +75,19 @@ public class SnapshotJobManagerConfig {
     public void setWorkDir(File workDir) {
         this.workDir = workDir;
     }
+
+    /**
+     * @return the stagingDir
+     */
+    public File getStagingDir() {
+        return stagingDir;
+    }
+
+    /**
+     * @param stagingDir to set
+     */
+    public void setStagingDir(File stagingDir) {
+        this.stagingDir = stagingDir;
+    }
+
 }

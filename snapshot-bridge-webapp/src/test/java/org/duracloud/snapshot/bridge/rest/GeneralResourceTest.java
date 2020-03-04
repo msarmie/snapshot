@@ -64,6 +64,7 @@ public class GeneralResourceTest extends SnapshotTestBase {
     private Integer finalizerPeriodMs = 1000;
     private int daysToExpire = 42;
     private File workDir = new File(System.getProperty("java.io.tmpdir"), "snapshot-work");
+    private File stagingDir = new File(System.getProperty("java.io.tmpdir"), "snapshot-staging");
 
     private boolean clean = true;
 
@@ -113,6 +114,8 @@ public class GeneralResourceTest extends SnapshotTestBase {
 
         System.setProperty(BridgeConfiguration.DURACLOUD_BRIDGE_ROOT_SYSTEM_PROPERTY,
                            this.workDir.getAbsolutePath());
+        System.setProperty(BridgeConfiguration.DURACLOUD_BRIDGE_STAGING_SYSTEM_PROPERTY,
+                           this.stagingDir.getAbsolutePath());
     }
 
     @Test
@@ -162,6 +165,8 @@ public class GeneralResourceTest extends SnapshotTestBase {
         bridgeConfiguration.setDuracloudEmailAddresses(duracloudEmailAddresses);
         EasyMock.expectLastCall();
         System.setProperty(BridgeConfiguration.DURACLOUD_BRIDGE_ROOT_SYSTEM_PROPERTY, this.workDir.getAbsolutePath());
+        System.setProperty(BridgeConfiguration.DURACLOUD_BRIDGE_STAGING_SYSTEM_PROPERTY,
+                this.stagingDir.getAbsolutePath());
 
         this.purgeTask.run();
         EasyMock.expectLastCall();

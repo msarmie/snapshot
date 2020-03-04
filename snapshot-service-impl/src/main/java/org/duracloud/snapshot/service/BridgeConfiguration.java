@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 public class BridgeConfiguration {
 
     public static final String DURACLOUD_BRIDGE_ROOT_SYSTEM_PROPERTY = "duracloud.bridge.root.dir";
+    public static final String DURACLOUD_BRIDGE_STAGING_SYSTEM_PROPERTY = "duracloud.bridge.staging.dir";
     public static final String DURACLOUD_BRIDGE_THREADS_PER_JOB = "duracloud.bridge.threads-per-job";
 
     private String[] duracloudEmailAddresses;
@@ -84,6 +85,25 @@ public class BridgeConfiguration {
             throw new RuntimeException(error);
         }
         File file = createDirectoryIfNotExists(rootDir);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        return file;
+    }
+
+    /**
+     * @return the bridge staging dir.
+     */
+    public static File getBridgeStagingDir() {
+        String stagingDir = System.getProperty(DURACLOUD_BRIDGE_STAGING_SYSTEM_PROPERTY);
+        if (stagingDir == null) {
+            String error = "Unable to locate  bridge STAGING directory because the " +
+                           DURACLOUD_BRIDGE_STAGING_SYSTEM_PROPERTY
+                           + " system property was not set.  Please specify a java command line parameter (e.g. -D"
+                           + DURACLOUD_BRIDGE_STAGING_SYSTEM_PROPERTY + "=/path/to/STAGING/dir)";
+            throw new RuntimeException(error);
+        }
+        File file = createDirectoryIfNotExists(stagingDir);
         if (!file.exists()) {
             file.mkdirs();
         }

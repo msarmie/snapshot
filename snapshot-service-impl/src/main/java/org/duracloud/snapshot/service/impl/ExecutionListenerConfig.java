@@ -24,6 +24,7 @@ public class ExecutionListenerConfig {
     private String[] duracloudEmailAddresses;
     private String[] targetStoreEmailAddresses;
     private File contentRoot;
+    private File stagingDir;
 
     public String getSesUsername() {
         return sesUsername;
@@ -84,6 +85,20 @@ public class ExecutionListenerConfig {
      */
     public File getContentRoot() {
         return contentRoot;
+    }
+
+    /**
+     * @return the staging directory
+     */
+    public File getStagingDir() {
+        return stagingDir;
+    }
+
+    /**
+     * @param stagingDir
+     */
+    public void setStagingDir(File stagingDir) {
+        this.stagingDir = stagingDir;
     }
 
 }

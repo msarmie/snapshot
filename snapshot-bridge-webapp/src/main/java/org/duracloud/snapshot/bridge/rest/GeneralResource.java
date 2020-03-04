@@ -228,6 +228,7 @@ public class GeneralResource {
         this.bridgeConfiguration.setDuracloudUsername(initParams.getDuracloudUsername());
         this.bridgeConfiguration.setDuracloudPassword(initParams.getDuracloudPassword());
         assert (BridgeConfiguration.getBridgeRootDir().exists());
+        assert (BridgeConfiguration.getBridgeStagingDir().exists());
     }
 
     /**
@@ -237,6 +238,9 @@ public class GeneralResource {
 
         NotificationConfig notifyConfig = new NotificationConfig();
         notifyConfig.setType(NotificationType.EMAIL.name());
+        notifyConfig.setNotificationType(initParams.getNotificationType());
+        notifyConfig.setNotificationHost(initParams.getNotificationHost());
+        notifyConfig.setNotificationPort(initParams.getNotificationPort());
         notifyConfig.setUsername(initParams.getAwsAccessKey());
         notifyConfig.setPassword(initParams.getAwsSecretKey());
         notifyConfig.setOriginator(
@@ -298,6 +302,7 @@ public class GeneralResource {
         notifyConfig.setOriginatorEmailAddress(
             initParams.getOriginatorEmailAddress());
         notifyConfig.setContentRoot(BridgeConfiguration.getContentRootDir());
+        notifyConfig.setStagingDir(BridgeConfiguration.getBridgeStagingDir());
         this.snapshotJobListener.init(notifyConfig);
         this.restoreJobListener.init(notifyConfig, initParams.getDaysToExpireRestore());
     }
@@ -312,6 +317,7 @@ public class GeneralResource {
         jobManagerConfig.setDuracloudPassword(initParams.getDuracloudPassword());
         jobManagerConfig.setContentRootDir(BridgeConfiguration.getContentRootDir());
         jobManagerConfig.setWorkDir(BridgeConfiguration.getBridgeWorkDir());
+        jobManagerConfig.setStagingDir(BridgeConfiguration.getBridgeStagingDir());
         this.jobManager.init(jobManagerConfig);
     }
 

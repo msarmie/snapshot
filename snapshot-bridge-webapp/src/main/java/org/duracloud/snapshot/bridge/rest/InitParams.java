@@ -24,6 +24,9 @@ public class InitParams {
     private String[] targetStoreEmailAddresses = null;
     private String awsAccessKey;
     private String awsSecretKey;
+    private String notificationType;
+    private String notificationHost;
+    private String notificationPort;
     private String databaseUser;
     private String databasePassword;
     private String databaseURL;
@@ -217,5 +220,29 @@ public class InitParams {
      */
     public void setDaysToExpireRestore(Integer daysToExpireRestore) {
         this.daysToExpireRestore = daysToExpireRestore;
+    }
+
+    public String getNotificationType() {
+        return notificationType;
+    }
+
+    public void setNotificationType(String notificationType) {
+        this.notificationType = notificationType;
+    }
+
+    public String getNotificationHost() {
+        return notificationHost;
+    }
+
+    public void setNotificationHost(String notificationHost) {
+        this.notificationHost = notificationHost;
+    }
+
+    public String getNotificationPort() {
+        return notificationPort;
+    }
+
+    public void setNotificationPort(String notificationPort) {
+        this.notificationPort = notificationPort;
     }
 }
