@@ -80,4 +80,11 @@ public interface SnapshotManager {
     public Snapshot updateHistory(Snapshot snapshot, String history);
 
     public void deleteSnapshot(String snapshotId);
+
+    /**
+     * This method iterates through snapshots with status REPLICATING_TO_STORAGE and
+     * creates zip object of the snapshot contents to store in the staging directory,
+     * ready to be harvested for preservation storage. Notification is sent once completed.
+     */
+    public void finalizeIngest();
 }

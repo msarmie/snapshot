@@ -65,6 +65,7 @@ public class FinalizerImpl implements Finalizer {
                     try {
                         log.info("Launching periodic finalization...");
                         snapshotManager.finalizeSnapshots();
+                        snapshotManager.finalizeIngest();
                         restoreManager.finalizeRestores();
                     } catch (Exception ex) {
                         ex.printStackTrace();
