@@ -79,7 +79,7 @@
                   <goal>deploy-only</goal>
                 </goals>
                 <configuration>
-                  <server>tomcat-server</server>
+                  <server>tomcat7-server</server>
                   <url>http://localhost:${tomcat.port}/manager/text</url>
                   <update>true</update>
                 </configuration>
@@ -166,7 +166,7 @@
   </profiles>
 
   <properties>
-    <tomcat.port>8080</tomcat.port>
+    <tomcat.port>8085</tomcat.port>
     <unitTests>**/*Test.class</unitTests>
     <integrationTests>**/Test*.class</integrationTests>
     <instrumentedTests>**/*Test*__*.class</instrumentedTests>
@@ -180,9 +180,9 @@
     <springframework.security.version>4.0.4.RELEASE</springframework.security.version>
     <spring.batch.version>3.0.7.RELEASE</spring.batch.version>
     <hibernate.version>5.1.0.Final</hibernate.version>
-    <mysql.connector.version>5.1.38</mysql.connector.version>
+    <mysql.connector.version>8.0.17</mysql.connector.version>
     <duracloud.version>6.2.0-SNAPSHOT</duracloud.version>
-    <duracloud.db.version>6.1.0</duracloud.db.version>
+    <duracloud.db.version>6.2.0-SNAPSHOT</duracloud.db.version>
     <duraspace-codestyle.version>1.1.0</duraspace-codestyle.version>
     <enforce-victims.rule.version>1.3.4</enforce-victims.rule.version>
     <jackson.version>2.7.4</jackson.version>

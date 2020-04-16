@@ -1,0 +1,18 @@
+{
+     "originatorEmailAddress" : "<email address>",         # From email address for notifications
+     "duracloudEmailAddresses" : ["<email address>"],      # Email address(es) of DuraCloud administrator
+     "targetStoreEmailAddresses" : ["<email address>"],    # Email address(es) of preservation storage administrator
+     "duracloudUsername" : "<duracloud username>",         # DuraCloud user's username
+     "duracloudPassword" : "<duracloud password>",         # DuraCloud user's password
+     "awsAccessKey" : "''",                                # Access key to AWS, with rights to use SES (for notifications)
+     "awsSecretKey" : "''",                                # Secret key to AWS
+     "notificationType": "<spring for smtp>",              # Email notification type: '' for AWS 'spring' for SMTP
+     "notificationHost": "<smtp server>",                  # Email notification SMTP host
+     "notificationPort": "<smtp port>",                    # Email notification SMTP port
+     "databaseUser" : "<database user>",                   # Bridge database username
+     "databasePassword" : "<databse password>",            # Bridge database password
+     "databaseURL" : "jdbc:mysql://<database instance>:<database port>/<database name>?useSSL=false&sessionVariables=wait_timeout=200000&serverTimezone=EST",  # Bridge database connection URL
+     "clean" : "false",                                    # True to reset database to a clean state, false to maintain data
+     "finalizerPeriodMs" : 60000,                          # Frequency of polling, optional, default is 3600000 (1 hour)
+     "daysToExpireRestore" : 30                            # Time to wait before clearing restored content
+}
